@@ -36,14 +36,24 @@ console_handler.setFormatter(CustomFormatter())
 logger.addHandler(console_handler)
 
 try:
-    home_path = os.environ[logging_name]
+    # Try to fetch the environment variable 'pymlrf', and provide a fallback path if not set
+    home_path = os.environ.get(logging_name, "/default/log/path")  # Fallback to a default path if not found
+    
+    # Check if the environment variable was not set and fallback is being used
+    if home_path == "/default/log/path":
+        logger.warning(f"{logging_name} environment variable not set. Using default path for logging.")
+    else:
+        logger.debug("Logging file path set using environment variable.")
+    
+    # Set up file handler for logging to file
     file_handler = logging.FileHandler(
-        os.path.join(home_path, "{}_log.txt".format(logging_name)))
+        os.path.join(home_path, f"{logging_name}_log.txt")
+    )
     file_handler.setFormatter(CustomFormatter())
     file_handler.setLevel(logging.WARNING)
     logger.addHandler(file_handler)
     logger.debug("Logging file successfully identified")
-except KeyError:
-    logger.warning(
-        "{} environment variable not set. Logging to file will not be performed".format(logging_name))
 
+except Exception as e:
+    # Catch any unexpected errors during file logging setup and log them
+    logger.error(f"Error in logging setup: {e}")
