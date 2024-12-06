@@ -45,6 +45,10 @@ try:
     else:
         logger.debug("Logging file path set using environment variable.")
     
+    # Ensure the directory exists
+    if not os.path.exists(home_path):
+        os.makedirs(home_path)  # Create the directory if it does not exist
+    
     # Set up file handler for logging to file
     file_handler = logging.FileHandler(
         os.path.join(home_path, f"{logging_name}_log.txt")
